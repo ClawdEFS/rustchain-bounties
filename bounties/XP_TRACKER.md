@@ -1,7 +1,7 @@
 ---
 title: RustChain Bounty Hunter XP and Levels
 description: Track XP, levels, badges, and progression for all bounty hunters (humans + agents)
-version: 1.2
+version: 1.3
 last_updated: 2026-02-18
 maintainer: Scottcjn
 ---
@@ -44,19 +44,31 @@ Welcome to the Hall of Hunters. Contributors earn XP for meaningful work and unl
 |---:|---|---|---:|---:|---|---|---|---|
 | 1 | _TBD_ | _TBD_ | 0 | 1 | Starting Hunter | - | bootstrap | tracker initialized |
 
-## Badge Gallery
+## Badge Gallery (Integrated shields.io URLs)
 
-- First Blood: first payout-worthy completion
-- Rising Hunter: reaches Level 4
-- Multiplier Hunter: reaches Level 5
-- Veteran Hunter: reaches Level 7
-- Legendary Hunter: reaches Level 10
-- Vintage Veteran: accepted vintage hardware proof
-- Agent Overlord: agent account reaches 500 XP
-- Tutorial Titan: accepted tutorial/doc bounty
-- Bug Slayer: accepted bug/security bounty
-- Outreach Pro: accepted outreach/SEO/marketing bounty
-- Streak Master: labeled streak milestone
+| Badge | URL | Markdown |
+|---|---|---|
+| First Blood | `https://img.shields.io/badge/First%20Blood-red?style=flat-square&logo=git&logoColor=white` | ![First Blood](https://img.shields.io/badge/First%20Blood-red?style=flat-square&logo=git&logoColor=white) |
+| Rising Hunter | `https://img.shields.io/badge/Rising%20Hunter-orange?style=flat-square&logo=rocket&logoColor=white` | ![Rising Hunter](https://img.shields.io/badge/Rising%20Hunter-orange?style=flat-square&logo=rocket&logoColor=white) |
+| Multiplier Hunter | `https://img.shields.io/badge/Multiplier%20Hunter-yellow?style=flat-square&logo=star&logoColor=black` | ![Multiplier Hunter](https://img.shields.io/badge/Multiplier%20Hunter-yellow?style=flat-square&logo=star&logoColor=black) |
+| Vintage Veteran | `https://img.shields.io/badge/Vintage%20Veteran-purple?style=flat-square&logo=apple&logoColor=white` | ![Vintage Veteran](https://img.shields.io/badge/Vintage%20Veteran-purple?style=flat-square&logo=apple&logoColor=white) |
+| Agent Overlord | `https://img.shields.io/badge/Agent%20Overlord-cyan?style=flat-square&logo=robot&logoColor=white` | ![Agent Overlord](https://img.shields.io/badge/Agent%20Overlord-cyan?style=flat-square&logo=robot&logoColor=white) |
+| Tutorial Titan | `https://img.shields.io/badge/Tutorial%20Titan-blue?style=flat-square&logo=book&logoColor=white` | ![Tutorial Titan](https://img.shields.io/badge/Tutorial%20Titan-blue?style=flat-square&logo=book&logoColor=white) |
+| Streak Master | `https://img.shields.io/badge/Streak%20Master-green?style=flat-square&logo=fire&logoColor=white` | ![Streak Master](https://img.shields.io/badge/Streak%20Master-green?style=flat-square&logo=fire&logoColor=white) |
+| Bug Slayer | `https://img.shields.io/badge/Bug%20Slayer-darkred?style=flat-square&logo=bug&logoColor=white` | ![Bug Slayer](https://img.shields.io/badge/Bug%20Slayer-darkred?style=flat-square&logo=bug&logoColor=white) |
+| Outreach Pro | `https://img.shields.io/badge/Outreach%20Pro-teal?style=flat-square&logo=twitter&logoColor=white` | ![Outreach Pro](https://img.shields.io/badge/Outreach%20Pro-teal?style=flat-square&logo=twitter&logoColor=white) |
+| Legendary Hunter | `https://img.shields.io/badge/Legendary%20Hunter-gold?style=flat-square&logo=crown&logoColor=black` | ![Legendary Hunter](https://img.shields.io/badge/Legendary%20Hunter-gold?style=flat-square&logo=crown&logoColor=black) |
+
+## Dynamic Badge Endpoints
+
+- Total XP: `https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Scottcjn/rustchain-bounties/main/badges/hunter-stats.json`
+- Top Hunter: `https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Scottcjn/rustchain-bounties/main/badges/top-hunter.json`
+- Active Hunters: `https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Scottcjn/rustchain-bounties/main/badges/active-hunters.json`
+- Legendary Hunters: `https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Scottcjn/rustchain-bounties/main/badges/legendary-hunters.json`
+- Updated At: `https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Scottcjn/rustchain-bounties/main/badges/updated-at.json`
+
+Per-hunter dynamic badge pattern:
+`https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Scottcjn/rustchain-bounties/main/badges/hunters/<hunter-slug>.json`
 
 ## Latest Awards
 
@@ -65,4 +77,6 @@ Welcome to the Hall of Hunters. Contributors earn XP for meaningful work and unl
 ## Notes
 
 - Automation source: `.github/workflows/bounty-xp-tracker.yml` + `.github/scripts/update_xp_tracker_api.py`.
+- Dynamic badge source: `.github/workflows/update-dynamic-badges.yml` + `.github/scripts/generate_dynamic_badges.py`.
+- Badge backfill is automatic: if a hunter already meets a threshold, missing threshold badges are added on the next XP update run.
 - The updater recalculates rank by XP descending on each award.

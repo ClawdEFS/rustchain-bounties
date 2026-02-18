@@ -39,18 +39,18 @@ LEVEL_THRESHOLDS: List[Tuple[int, int, str]] = [
     (18000, 10, "Legendary Hunter"),
 ]
 
-BADGE_STYLE: Dict[str, Tuple[str, str]] = {
-    "First Blood": ("red", "git"),
-    "Rising Hunter": ("orange", "rocket"),
-    "Multiplier Hunter": ("yellow", "star"),
-    "Veteran Hunter": ("purple", "shield"),
-    "Legendary Hunter": ("gold", "crown"),
-    "Vintage Veteran": ("purple", "apple"),
-    "Agent Overlord": ("cyan", "robot"),
-    "Tutorial Titan": ("blue", "book"),
-    "Bug Slayer": ("darkred", "bug"),
-    "Outreach Pro": ("teal", "megaphone"),
-    "Streak Master": ("green", "fire"),
+BADGE_STYLE: Dict[str, Tuple[str, str, str]] = {
+    "First Blood": ("red", "git", "white"),
+    "Rising Hunter": ("orange", "rocket", "white"),
+    "Multiplier Hunter": ("yellow", "star", "black"),
+    "Veteran Hunter": ("purple", "shield", "white"),
+    "Legendary Hunter": ("gold", "crown", "black"),
+    "Vintage Veteran": ("purple", "apple", "white"),
+    "Agent Overlord": ("cyan", "robot", "white"),
+    "Tutorial Titan": ("blue", "book", "white"),
+    "Bug Slayer": ("darkred", "bug", "white"),
+    "Outreach Pro": ("teal", "twitter", "white"),
+    "Streak Master": ("green", "fire", "white"),
 }
 
 
@@ -148,9 +148,12 @@ def calculate_xp(event_type: str, event_action: str, labels: Set[str], pr_merged
 
 
 def badge_url(name: str) -> str:
-    color, logo = BADGE_STYLE.get(name, ("blue", "star"))
+    color, logo, logo_color = BADGE_STYLE.get(name, ("blue", "star", "white"))
     encoded = quote(name)
-    return f"https://img.shields.io/badge/{encoded}-{color}?style=flat-square&logo={logo}"
+    return (
+        f"https://img.shields.io/badge/{encoded}-{color}"
+        f"?style=flat-square&logo={logo}&logoColor={logo_color}"
+    )
 
 
 def badge_md(name: str) -> str:
@@ -246,11 +249,11 @@ def determine_new_badges(existing: Set[str], old_xp: int, new_xp: int,
         if cond and name not in existing and name not in unlocked:
             unlocked.append(name)
 
-    maybe("First Blood", old_xp == 0 and new_xp > 0)
-    maybe("Rising Hunter", old_xp < 1000 <= new_xp)
-    maybe("Multiplier Hunter", old_xp < 2000 <= new_xp)
-    maybe("Veteran Hunter", old_xp < 5500 <= new_xp)
-    maybe("Legendary Hunter", old_xp < 18000 <= new_xp)
+    maybe("First Blood", new_xp > 0)
+    maybe("Rising Hunter", new_xp >= 1000)
+    maybe("Multiplier Hunter", new_xp >= 2000)
+    maybe("Veteran Hunter", new_xp >= 5500)
+    maybe("Legendary Hunter", new_xp >= 18000)
     maybe("Vintage Veteran", "vintage" in labels)
     maybe("Tutorial Titan", "tutorial" in labels or "docs" in labels)
     maybe("Bug Slayer", "bug" in labels or "security" in labels or "critical" in labels)
@@ -292,6 +295,17 @@ def update_table_in_md(md: str, actor: str, gained_xp: int, reason: str,
         if row.hunter == "_TBD_":
             continue
         rows.append(row)
+
+    # Backfill threshold-based badges for existing hunters each run.
+    for row in rows:
+        retro = determine_new_badges(
+            existing=row.badges,
+            old_xp=row.xp,
+            new_xp=row.xp,
+            labels=set(),
+            actor=row.hunter,
+        )
+        row.badges.update(retro)
 
     actor_key = f"@{actor}"
     target: Optional[HunterRow] = None
